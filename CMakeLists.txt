@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.2)
-
 project(ibotpp)
 include_directories(include)
+find_package(Threads REQUIRED)
+find_package(Boost REQUIRED system thread)
 add_executable(ibotpp src/main.cpp)
 set_property(TARGET ibotpp PROPERTY CXX_STANDARD 11)
 set_property(TARGET ibotpp PROPERTY CXX_STANDARD_REQUIRED ON)
-target_link_libraries(ibotpp pthread ssl boost_system boost_thread)
+target_link_libraries(ibotpp ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES})
