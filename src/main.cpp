@@ -1,3 +1,4 @@
+#include <boost/scoped_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/thread.hpp>
@@ -7,8 +8,8 @@
 //#include <clang/Driver/Compilation.h>
 //#include <clang/Driver/Driver.h>
 //#include <clang/Driver/Tool.h>
-//#include <clang/Frontend/CompilerInstance.h>
-//#include <clang/Frontend/CompilerInvocation.h>
+#include <clang/Frontend/CompilerInstance.h>
+#include <clang/Frontend/CompilerInvocation.h>
 //#include <clang/Frontend/FrontendDiagnostic.h>
 #include <clang/Frontend/TextDiagnosticPrinter.h>
 //#include <llvm/ADT/SmallString.h>
@@ -31,10 +32,17 @@ void worker_main(boost::shared_ptr<boost::asio::io_service> io_service) {
 int main(int argc, char *argv[]) {
 	boost::container::vector<const char *> args;
 	args.emplace_back("test.cpp");
+
 	llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions> diag_opts(new clang::DiagnosticOptions());
 	auto diag_printer = boost::make_shared<clang::TextDiagnosticPrinter>(llvm::errs(), diag_opts.get());
 	llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> diag_ids(new clang::DiagnosticIDs());
 	clang::DiagnosticsEngine diag_engine(diag_ids, diag_opts.get(), diag_printer.get());
+
+	auto ci = boost::make_shared<clang::CompilerInvocation>();
+	clang::CompilerInvocation::CreateFromArgs(*ci, args.data(), args.data() + args.size(), diag_engine);
+
+	clang::CompilerInstance compiler;
+	compiler.setInvocation(ci.get());
 
 	auto io_service = boost::make_shared<boost::asio::io_service>();
 	auto work = boost::make_shared<boost::asio::io_service::work>(*io_service);
