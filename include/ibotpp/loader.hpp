@@ -34,7 +34,13 @@ namespace ibotpp {
 		}
 
 		std::unique_ptr<llvm::Module> load(const std::string &path) {
+			return load_llvm_module(path);
+		}
+
+		std::unique_ptr<llvm::Module> load_llvm_module(const std::string &path) {
 			boost::container::vector<const char *> args;
+			args.emplace_back("-include-pch");
+			args.emplace_back("module.pch");
 			args.emplace_back(path.c_str());
 			clang::CompilerInvocation::CreateFromArgs(*invocation, args.data(),
 			                                          args.data() + args.size(),
