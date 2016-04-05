@@ -10,14 +10,17 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/CompilerInvocation.h>
 #include <clang/Frontend/TextDiagnosticPrinter.h>
+#include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/Host.h>
 #include <llvm/Support/Program.h>
 #include <llvm/Support/raw_ostream.h>
+#include <ibotpp/module.hpp>
 
 namespace ibotpp {
 	class loader {
 	private:
+		std::unique_ptr<llvm::LLVMContext> llvm_context;
 		llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> diag_ids;
 		llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions> diag_options;
 		clang::DiagnosticsEngine diag_engine;
@@ -27,7 +30,8 @@ namespace ibotpp {
 
 	public:
 		loader(void)
-				: diag_ids(new clang::DiagnosticIDs()),
+				: llvm_context(new llvm::LLVMContext()),
+				  diag_ids(new clang::DiagnosticIDs()),
 				  diag_options(new clang::DiagnosticOptions()),
 				  diag_engine(diag_ids, diag_options.get(),
 					new clang::TextDiagnosticPrinter(llvm::errs(),
@@ -48,8 +52,8 @@ namespace ibotpp {
 			}
 		}
 
-		std::unique_ptr<llvm::Module> load(const std::string &path) {
-			return load_llvm_module(path);
+		ibotpp::module load(const std::string &path) {
+			return get_module_value(load_llvm_module(path));
 		}
 
 		std::unique_ptr<llvm::Module> load_llvm_module(const std::string &path) {
@@ -67,11 +71,16 @@ namespace ibotpp {
 			                                          args.data() + args.size(),
 			                                          diag_engine);
 			compiler.setInvocation(invocation.get());
-			clang::EmitLLVMOnlyAction action;
+			clang::EmitLLVMOnlyAction action(llvm_context.get());
 			if(!compiler.ExecuteAction(action)) {
 				throw std::runtime_error("failed to execute action");
 			}
 			return action.takeModule();
+		}
+
+		ibotpp::module get_module_value(std::unique_ptr<llvm::Module> module) {
+			auto global = module->getNamedGlobal("module");
+			return ibotpp::module{""};
 		}
 	};
 }
