@@ -26,10 +26,15 @@ namespace ibotpp {
 
 #ifdef IBOTPP_IS_MODULE
 
+#include <ibotpp/bot.hpp>
+
 void * __dso_handle = nullptr;
 
 #define MODULE_DECLARATION extern "C" ibotpp::module * module(void)
-#define MODULE(...) MODULE_DECLARATION { return new ibotpp::module(__VA_ARGS__); }
+#define MODULE(...) MODULE_DECLARATION { \
+	using namespace ibotpp; \
+	return new ibotpp::module(__VA_ARGS__); \
+}
 
 MODULE_DECLARATION;
 
