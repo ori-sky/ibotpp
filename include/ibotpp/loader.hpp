@@ -62,11 +62,12 @@ namespace ibotpp {
 		}
 
 		std::unique_ptr<ibotpp::module> load(const std::string &path) {
-			return get_module_value(load_llvm_module(path));
+			return get_module_value(load_llvm_module("modules/" + path + ".cpp"));
 		}
 
 		std::unique_ptr<llvm::Module> load_llvm_module(const std::string &path) {
 			auto compilation = driver->BuildCompilation({"-c++", "-std=c++11",
+			                                             "-I", "modules",
 			                                             "-include", "module.hpp",
 			                                             path.c_str()});
 			if(!compilation) {

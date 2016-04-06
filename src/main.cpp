@@ -11,7 +11,7 @@ void worker_main(boost::shared_ptr<boost::asio::io_service> io_service) {
 
 int main(int argc, char *argv[]) {
 	ibotpp::loader loader;
-	auto module = loader.load("test.cpp");
+	auto module = loader.load("test");
 	std::cout << "name = " << module->name << std::endl;
 
 	auto io_service = boost::make_shared<boost::asio::io_service>();
