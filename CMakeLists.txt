@@ -8,9 +8,7 @@ find_package(ZLIB REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Curses REQUIRED)
 find_package(Boost REQUIRED system thread)
-find_package(LLVM REQUIRED
-	core analysis support
-)
+find_package(LLVM REQUIRED)
 find_package(Clang REQUIRED
 	clangCodeGen clangFrontend clangDriver clangParse clangRewrite clangSema
 	clangAnalysis clangSerialization clangTooling clangEdit clangAST clangLex
@@ -24,4 +22,7 @@ add_definitions(-D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS)
 add_executable(ibotpp src/main.cpp)
 set_property(TARGET ibotpp PROPERTY CXX_STANDARD 11)
 set_property(TARGET ibotpp PROPERTY CXX_STANDARD_REQUIRED ON)
-target_link_libraries(ibotpp ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${CLANG_LIBS} ${LLVM_LIBS} ${CURSES_LIBRARIES} ${CMAKE_DL_LIBS} ${ZLIB_LIBRARIES})
+target_link_libraries(ibotpp
+	${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${CLANG_LIBS} ${LLVM_LIBS}
+	${CURSES_LIBRARIES} ${CMAKE_DL_LIBS} ${ZLIB_LIBRARIES} ffi
+)
