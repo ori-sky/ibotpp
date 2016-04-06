@@ -1,4 +1,6 @@
-find_package(LLVM REQUIRED)
+if(NOT LLVM_FOUND)
+	message(FATAL_ERROR "Must find LLVM before Clang")
+endif()
 
 if(NOT Clang_FIND_COMPONENTS)
 	message(FATAL_ERROR "Must specify which Clang components to find")
