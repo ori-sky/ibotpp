@@ -5,11 +5,16 @@
 #include <string>
 
 namespace ibotpp {
-	struct module {
-		std::string name;
+	class module {
+	public:
+		const std::string name;
+		module(const std::string name) : name(name) {}
 	};
 }
 
-extern ibotpp::module module;
+#define MODULE_DECLARATION extern "C" ibotpp::module * module(void)
+#define MODULE(...) MODULE_DECLARATION { return new ibotpp::module(__VA_ARGS__); }
+
+MODULE_DECLARATION;
 
 #endif
