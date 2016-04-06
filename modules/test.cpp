@@ -3,6 +3,6 @@
 MODULE(
 	"test", // name
 	{       // handlers
-		{"test", [] { std::cout << "hello world" << std::endl; }
+		{"test", [] { std::cout << "hello world" << std::endl; }}
 	}
-})
+)
