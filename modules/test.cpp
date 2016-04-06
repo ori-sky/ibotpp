@@ -1,1 +1,1 @@
-MODULE("test")
+MODULE("test", {})
