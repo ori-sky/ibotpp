@@ -19,12 +19,6 @@ namespace ibotpp {
 		const std::string host;
 		const uint16_t port;
 		boost::shared_ptr<socket_type> socket;
-	public:
-		bot(decltype(io_service) io_service, decltype(strand) strand,
-		    decltype(host) host, decltype(port) port)
-				: io_service(io_service), strand(strand), host(host), port(port) {
-			connect();
-		}
 
 		void connect(void) {
 			socket = boost::make_shared<socket_type>(*io_service);
@@ -74,6 +68,12 @@ namespace ibotpp {
 				std::cout << "-> " << buffer << std::endl;
 				read_loop();
 			}
+		}
+	public:
+		bot(decltype(io_service) io_service, decltype(strand) strand,
+		    decltype(host) host, decltype(port) port)
+				: io_service(io_service), strand(strand), host(host), port(port) {
+			connect();
 		}
 	};
 }
