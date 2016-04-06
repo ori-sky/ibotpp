@@ -69,7 +69,7 @@ namespace ibotpp {
 			auto compilation = driver->BuildCompilation({"-c++", "-std=c++11",
 			                                             "-DIBOTPP_IS_MODULE",
 			                                             "-Imodules",
-			                                             "-include", "module.hpp",
+			                                             "-include", "ibotpp/module.hpp",
 			                                             path.c_str()});
 			if(!compilation) {
 				throw std::runtime_error("failed to build driver compilation");
