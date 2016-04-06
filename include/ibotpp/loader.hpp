@@ -10,10 +10,15 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/CompilerInvocation.h>
 #include <clang/Frontend/TextDiagnosticPrinter.h>
+#include <llvm/ExecutionEngine/ExecutionEngine.h>
+#include <llvm/ExecutionEngine/Interpreter.h>
+#include <llvm/ExecutionEngine/MCJIT.h>
+#include <llvm/ExecutionEngine/GenericValue.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/Host.h>
 #include <llvm/Support/Program.h>
+#include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/raw_ostream.h>
 #include <ibotpp/module.hpp>
 
@@ -37,7 +42,9 @@ namespace ibotpp {
 					new clang::TextDiagnosticPrinter(llvm::errs(),
 					                                 diag_options.get())),
 				  invocation(new clang::CompilerInvocation()) {
-			auto error_or_clang_path = llvm::sys::findProgramByName("clang");
+			llvm::InitializeNativeTarget();
+			llvm::InitializeNativeTargetAsmPrinter();
+			auto error_or_clang_path = llvm::sys::findProgramByName("clang++");
 			if(!error_or_clang_path) {
 				throw std::runtime_error("failed to find path of clang executable");
 			}
@@ -52,13 +59,12 @@ namespace ibotpp {
 			}
 		}
 
-		ibotpp::module load(const std::string &path) {
+		std::unique_ptr<ibotpp::module> load(const std::string &path) {
 			return get_module_value(load_llvm_module(path));
 		}
 
 		std::unique_ptr<llvm::Module> load_llvm_module(const std::string &path) {
-			auto compilation = driver->BuildCompilation({"-std=c++11",
-			                                             "-fsanitize=address",
+			auto compilation = driver->BuildCompilation({"-c++", "-std=c++11",
 			                                             "-include", "module.hpp",
 			                                             path.c_str()});
 			if(!compilation) {
@@ -70,6 +76,9 @@ namespace ibotpp {
 			clang::CompilerInvocation::CreateFromArgs(*invocation, args.data(),
 			                                          args.data() + args.size(),
 			                                          diag_engine);
+			//llvm::errs() << "clang invocation: ";
+			//jobs.Print(llvm::errs(), " ", true);
+			//llvm::errs() << "\n";
 			compiler.setInvocation(invocation.get());
 			clang::EmitLLVMOnlyAction action(llvm_context.get());
 			if(!compiler.ExecuteAction(action)) {
@@ -78,9 +87,23 @@ namespace ibotpp {
 			return action.takeModule();
 		}
 
-		ibotpp::module get_module_value(std::unique_ptr<llvm::Module> module) {
-			auto global = module->getNamedGlobal("module");
-			return ibotpp::module{""};
+		std::unique_ptr<ibotpp::module> get_module_value(std::unique_ptr<llvm::Module> module) {
+			auto fn = module->getFunction("module");
+			if(!fn) {
+				throw std::runtime_error("failed to find module function");
+			}
+			std::string err;
+			auto exec_engine = llvm::EngineBuilder(std::move(module))
+				.setEngineKind(llvm::EngineKind::Either)
+				.setErrorStr(&err)
+				.create();
+			if(!exec_engine) {
+				throw std::runtime_error("failed to create execution engine: " + err);
+			}
+			exec_engine->finalizeObject();
+			auto value = exec_engine->runFunction(fn, {});
+			auto ptr = reinterpret_cast<ibotpp::module *>(value.PointerVal);
+			return std::unique_ptr<ibotpp::module>(ptr);
 		}
 	};
 }
