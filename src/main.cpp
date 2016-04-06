@@ -1,6 +1,4 @@
-#include <boost/scoped_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/container/vector.hpp>
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
 #include <ibotpp/loader.hpp>
