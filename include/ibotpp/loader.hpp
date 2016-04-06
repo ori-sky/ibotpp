@@ -61,7 +61,7 @@ namespace ibotpp {
 			}
 		}
 
-		std::unique_ptr<ibotpp::module> load(const std::string &path) {
+		std::unique_ptr<module> load(const std::string &path) {
 			return get_module_value(load_llvm_module("modules/" + path + ".cpp"));
 		}
 
@@ -91,13 +91,13 @@ namespace ibotpp {
 			return action.takeModule();
 		}
 
-		std::unique_ptr<ibotpp::module> get_module_value(std::unique_ptr<llvm::Module> module) {
-			auto fn = module->getFunction("module");
+		std::unique_ptr<module> get_module_value(std::unique_ptr<llvm::Module> m) {
+			auto fn = m->getFunction("module");
 			if(!fn) {
 				throw std::runtime_error("failed to find module function");
 			}
 			std::string err;
-			auto exec_engine = llvm::EngineBuilder(std::move(module))
+			auto exec_engine = llvm::EngineBuilder(std::move(m))
 				.setEngineKind(llvm::EngineKind::Either)
 				.setErrorStr(&err)
 				.create();
@@ -106,8 +106,8 @@ namespace ibotpp {
 			}
 			exec_engine->finalizeObject();
 			auto value = exec_engine->runFunction(fn, {});
-			auto ptr = reinterpret_cast<ibotpp::module *>(value.PointerVal);
-			return std::unique_ptr<ibotpp::module>(ptr);
+			auto ptr = reinterpret_cast<module *>(value.PointerVal);
+			return std::unique_ptr<module>(ptr);
 		}
 	};
 }
