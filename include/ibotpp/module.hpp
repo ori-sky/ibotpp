@@ -24,9 +24,14 @@ namespace ibotpp {
 	};
 }
 
+#ifdef IBOTPP_IS_MODULE
+
+void * __dso_handle = nullptr;
+
 #define MODULE_DECLARATION extern "C" ibotpp::module * module(void)
 #define MODULE(...) MODULE_DECLARATION { return new ibotpp::module(__VA_ARGS__); }
 
 MODULE_DECLARATION;
 
+#endif
 #endif

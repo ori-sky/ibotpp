@@ -67,7 +67,8 @@ namespace ibotpp {
 
 		std::unique_ptr<llvm::Module> load_llvm_module(const std::string &path) {
 			auto compilation = driver->BuildCompilation({"-c++", "-std=c++11",
-			                                             "-I", "modules",
+			                                             "-DIBOTPP_IS_MODULE",
+			                                             "-Imodules",
 			                                             "-include", "module.hpp",
 			                                             path.c_str()});
 			if(!compilation) {
