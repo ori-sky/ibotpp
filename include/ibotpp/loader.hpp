@@ -17,6 +17,7 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/Host.h>
+#include <llvm/Support/ManagedStatic.h>
 #include <llvm/Support/Program.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/raw_ostream.h>
@@ -32,6 +33,7 @@ namespace ibotpp {
 		std::unique_ptr<clang::driver::Driver> driver;
 		llvm::IntrusiveRefCntPtr<clang::CompilerInvocation> invocation;
 		clang::CompilerInstance compiler;
+		llvm::llvm_shutdown_obj llvm_destructor;
 
 	public:
 		loader(void)
