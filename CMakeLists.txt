@@ -26,3 +26,9 @@ target_link_libraries(ibotpp
 	${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${CLANG_LIBS} ${LLVM_LIBS}
 	${CURSES_LIBRARIES} ${CMAKE_DL_LIBS} ${ZLIB_LIBRARIES} ffi
 )
+
+add_custom_target(module.hpp ALL
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		${CMAKE_CURRENT_SOURCE_DIR}/include/ibotpp/module.hpp
+		${CMAKE_CURRENT_BINARY_DIR}/module.hpp
+)
