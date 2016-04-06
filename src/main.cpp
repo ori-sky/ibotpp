@@ -13,6 +13,7 @@ int main(int argc, char *argv[]) {
 	ibotpp::loader loader;
 	auto module = loader.load("test");
 	std::cout << "name = " << module->name << std::endl;
+	module->handlers["test"]();
 
 	auto io_service = boost::make_shared<boost::asio::io_service>();
 	auto work = boost::make_shared<boost::asio::io_service::work>(*io_service);
