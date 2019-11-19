@@ -8,6 +8,7 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 //#include <boost/algorithm/string/split.hpp>
+#include <ibotpp/message.hpp>
 
 namespace ibotpp {
 	class bot {
@@ -74,6 +75,10 @@ namespace ibotpp {
 		    decltype(host) host, decltype(port) port)
 				: io_service(io_service), strand(strand), host(host), port(port) {
 			connect();
+		}
+
+		void send(const message &msg) const {
+			write(msg.str());
 		}
 	};
 }

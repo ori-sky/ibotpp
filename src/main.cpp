@@ -11,9 +11,8 @@ void worker_main(boost::shared_ptr<boost::asio::io_service> io_service) {
 
 int main(int argc, char *argv[]) {
 	ibotpp::loader loader;
-	auto module = loader.load("test");
+	auto module = loader.load("ping");
 	std::cout << "name = " << module->name << std::endl;
-	module->handlers["test"]();
 
 	auto io_service = boost::make_shared<boost::asio::io_service>();
 	auto work = boost::make_shared<boost::asio::io_service::work>(*io_service);
@@ -22,7 +21,9 @@ int main(int argc, char *argv[]) {
 	for(unsigned int w = 0; w < CONFIG_NUM_WORKERS; ++w) {
 		workers.create_thread(boost::bind(&worker_main, io_service));
 	}
+
 	ibotpp::bot bot(io_service, strand, CONFIG_HOST, CONFIG_PORT);
+	module->handlers["ping"](bot);
 
 	work.reset();
 	workers.join_all();

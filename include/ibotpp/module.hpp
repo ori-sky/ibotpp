@@ -5,11 +5,12 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include <ibotpp/bot.hpp>
 
 namespace ibotpp {
 	class module {
 	public:
-		typedef std::function<void()> handler_type;
+		typedef std::function<void(bot &)> handler_type;
 		typedef std::unordered_map<std::string, handler_type> handlers_type;
 
 		const std::string name;
@@ -25,8 +26,6 @@ namespace ibotpp {
 }
 
 #ifdef IBOTPP_IS_MODULE
-
-#include <ibotpp/bot.hpp>
 
 void * __dso_handle = nullptr;
 

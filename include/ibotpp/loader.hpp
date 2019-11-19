@@ -46,6 +46,7 @@ namespace ibotpp {
 				  invocation(new clang::CompilerInvocation()) {
 			llvm::InitializeNativeTarget();
 			llvm::InitializeNativeTargetAsmPrinter();
+			llvm::InitializeNativeTargetAsmParser();
 			auto error_or_clang_path = llvm::sys::findProgramByName("clang++");
 			if(!error_or_clang_path) {
 				throw std::runtime_error("failed to find path of clang executable");

@@ -1,8 +1,9 @@
 MODULE(
 	"ping", // name
 	{       // handlers
-		{"ibotpp", "ping", [] (bot bot, std::string str) {
-			bot.send("PONG", str);
+		{"ping", [] (const bot &bot) {
+			message msg("pong", {"test"});
+			bot.send(msg);
 		}}
 	}
 )
